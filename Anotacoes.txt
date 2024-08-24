@@ -1,0 +1,18 @@
+az account set --subscription fb137f6a-26a7-40b6-9ccd-cbca3be1273b
+az acr create --name acrnativerogerio --resource-group rgrogerio --sku Basic
+
+az network vnet create -g rgrogerio -n vnet-01 --address-prefix 10.0.0.0/16 --subnet-name aks-subnet --subnet-prefixes 10.0.0.0/20
+
+az deployment group create --resource-group RGXXXXXX --template-file <CaminhoParaOArquivoTemplate>.json --parameters resourceName=rgrogerio-aks dnsPrefix=<SeuDnsPrefix> servicePrincipalClientId=<SeuClientId> servicePrincipalClientSecret=<SeuClientSecret>
+
+az aks get-credentials --resource-group rgrogerio --name rgrogerio-aks --overwrite-existing
+
+kubectl get deployments --namespace rgrogerio-aks
+
+az acr build --registry acrnativerogerio --image hellofromnode:v1.0 .
+
+kubectl apply -f aks-deployment-l01.yaml -n=dev-node
+
+kubectl get deployments -n=dev-node
+
+kubectl get services -n=dev-node
